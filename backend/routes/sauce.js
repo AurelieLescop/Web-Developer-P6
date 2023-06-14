@@ -1,4 +1,5 @@
 const express = require('express');
+const auth = require('auth');
 const router = express.Router();
 
 const sauceCtrl = require('../controllers/sauce');;
@@ -10,11 +11,11 @@ const sauceCtrl = require('../controllers/sauce');;
         message: 'Objet créé !'
     });
 });*/
-router.post('/', sauceCtrl.createThing);
-router.put('/:id', sauceCtrl.modifyThing);
-router.delete('/:id', sauceCtrl.deleteThing);
-router.get('/:id', sauceCtrl.getOneThing);
-router.get('/', sauceCtrl.getAllThings);
+router.post('/', auth, sauceCtrl.createThing);
+router.put('/:id', auth, sauceCtrl.modifyThing);
+router.delete('/:id', auth, sauceCtrl.deleteThing);
+router.get('/:id', auth, sauceCtrl.getOneThing);
+router.get('/', auth, sauceCtrl.getAllThings);
 
 /*
 router.post('/', stuffCtrl.createThing);
