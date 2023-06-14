@@ -4,7 +4,7 @@ const express = require('express');
 
 const app = express();
 
-const stuffRoutes = require('.routes/sauce');
+const stuffRoutes = require('./routes/sauce');
 
 mongoose.connect('mongodb+srv://Lily:uxBLzmcRsOqJqrsC@cluster0.mzvepik.mongodb.net/?retryWrites=true&w=majority',
   {
