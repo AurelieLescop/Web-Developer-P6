@@ -13,7 +13,7 @@ const sauceCtrl = require('../controllers/sauce');;
     });
 });*/
 router.post('/', auth, multer, sauceCtrl.createThing);
-router.put('/:id', auth, sauceCtrl.modifyThing);
+router.put('/:id', auth, multer, sauceCtrl.modifyThing);
 router.delete('/:id', auth, sauceCtrl.deleteThing);
 router.get('/:id', auth, sauceCtrl.getOneThing);
 router.get('/', auth, sauceCtrl.getAllThings);
