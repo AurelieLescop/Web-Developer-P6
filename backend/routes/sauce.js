@@ -1,6 +1,7 @@
 const express = require('express');
-const auth = require('../middleware/auth');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const multer = require('../middleware/multer-config');
 
 const sauceCtrl = require('../controllers/sauce');;
 //const stuffCtrl = require('../controllers/sauce');;
@@ -11,7 +12,7 @@ const sauceCtrl = require('../controllers/sauce');;
         message: 'Objet créé !'
     });
 });*/
-router.post('/', auth, sauceCtrl.createThing);
+router.post('/', auth, multer, sauceCtrl.createThing);
 router.put('/:id', auth, sauceCtrl.modifyThing);
 router.delete('/:id', auth, sauceCtrl.deleteThing);
 router.get('/:id', auth, sauceCtrl.getOneThing);
