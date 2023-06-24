@@ -18,7 +18,7 @@ exports.createThing = (req, res, next) => {
     });
 
     thing.save()
-  //  sauce.save()
+   //sauce.save()
         .then(() => { res.status(201).json({ message: 'Sauce enregistrée !' }) })
         .catch(error => { res.status(400).json({ error }) })
 };
@@ -32,7 +32,7 @@ exports.modifyThing = (req, res, next) => {
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
 
-    delete thingObject._userId;b
+    delete thingObject._userId
     Thing.findOne({ _id: req.params.id })
         .then((thing) => {
             if (thing.userId != req.auth.userId) {
@@ -84,5 +84,12 @@ exports.getAllThings = (req, res, next) => {
     Thing.find()
         .then(things => res.status(200).json(things))
         .catch(error => res.status(400).json({ error }));
+};
+
+exports.likeDislikeSauce = (req, res, next) => {
+    const like = req.body.like;
+    if (like == 1) {
+
+    }
 };
 
