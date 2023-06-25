@@ -89,7 +89,7 @@ exports.getAllThings = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
-/* fonctionne
+/* fonctionne - pas erruer ds terminal
 exports.likeDislikeSauce = (req, res, next) => {
     const like = req.body.like;
     const userId = req.body.userId;
@@ -101,6 +101,59 @@ exports.likeDislikeSauce = (req, res, next) => {
 }
 */
 
+/* //essai 2 echec
+// https://stackoverflow.com/questions/74645895/like-dislike-system-with-nodejs
+exports.likeDislikeSauce = (req, res, next) => {  
+    //   const liker = req.body.userId;
+    const userId = req.body.userId;
+    // let likeStatus = req.body.like;
+    let likeDislikeStatus = req.body.like;
+    //   sauce.findOne({ _id: req.params.id })
+      thing.findOne({ _id: req.params.id })
+        .then(() => {  
+        //   if (likeStatus === 1) {
+          if (likeDislikeStatus === 1) {
+            // sauce.updateOne({ _id:req.params.id }, { $push: { usersLiked: liker }, $inc: { likes:1 }})
+            thing.updateOne({ _id:req.params.id }, { $push: { usersLiked: userId }, $inc: { likes:1 }})
+              .then(() => res.status(201).json({ message: 'you liked this sauce' }))
+              .catch(error => res.status(400).json({ error }))
+        //   } else if (likeStatus === -1) {
+          } else if (likeDislikeStatus === -1) {
+            // sauce.updateOne({ _id: req.params.id }, { $inc: { dislikes: 1 }, $push: { usersDisliked: liker }})
+            thing.updateOne({ _id: req.params.id }, { $inc: { dislikes: 1 }, $push: { usersDisliked: userId }})
+              .then(() => res.status(201).json({ message: 'you disliked this sauce' }))
+              .catch(error => res.status(400).json({ error }))
+        //   } else if (likeStatus === 0) {
+          } else if (likeDislikeStatus === 0) {
+            if(usersLiked.includes(userId)){
+                sauce.updateOne({_id: req.params.id}, { $inc: { likes: -1}, $pull: { usersLiked:liuserId}})
+              } else if (usersDisliked.includes(userId)){
+                sauce.updateOne({_id: req.params.id}, { $inc: { dislikes: -1}, $pull: { usersDisliked:userId}})
+              }
+          }
+        })
+        .catch(error => res.status(400).json({ error }))
+    };
+    
+    
+    /* essai perso - ne fonctionne pas
+    exports.likeDislikeSauce = (req, res, next) => {
+        const like = req.body.like;
+        const userId = req.body.userId;
+        const sauceId = req.params.id;
+        
+        Thing.findOne({ _id: req.params.id })
+        .then((thing)) => {
+           if (like ===1) {
+            thing.usersLiked.push(userId);
+            }
+        .catch(error => res.status(404).json({ error }));
+        
+    }
+
+
+/*
+//essai 1 - stackoverflow - ne fonctionne pas
 exports.likeDislikeSauce = (req, res, next) => {  
 //   const liker = req.body.userId;
 const userId = req.body.userId;
@@ -140,8 +193,9 @@ let likeDislikeStatus = req.body.like;
     })
     .catch(error => res.status(400).json({ error }))
 };
+*/
 
-/*
+/* essai perso - ne fonctionne pas
 exports.likeDislikeSauce = (req, res, next) => {
     const like = req.body.like;
     const userId = req.body.userId;
