@@ -3,14 +3,14 @@ const fs = require('fs');
 
 // changer Thing en sauce
 exports.createThing = (req, res, next) => {
-// function createThing(req, res, next) {
+    // function createThing(req, res, next) {
 
     //const thingObject = JSON.parse(req.body.thing);
     const thingObject = JSON.parse(req.body.sauce);
     delete thingObject._id;
     delete thingObject._userId;
-   const thing = new Thing({
-    // const sauce = new Sauce({
+    const thing = new Thing({
+        // const sauce = new Sauce({
 
         ...thingObject,
         userId: req.auth.userId,
@@ -18,7 +18,7 @@ exports.createThing = (req, res, next) => {
     });
 
     thing.save()
-   //sauce.save()
+        //sauce.save()
         .then(() => { res.status(201).json({ message: 'Sauce enregistrée !' }) })
         .catch(error => { res.status(400).json({ error }) })
 };
@@ -27,7 +27,7 @@ exports.createThing = (req, res, next) => {
 
 exports.modifyThing = (req, res, next) => {
     const thingObject = req.file ? {
-     //   ...JSON.parse(req.body.thing),
+        //   ...JSON.parse(req.body.thing),
         ...JSON.parse(req.body.sauce),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
@@ -40,9 +40,9 @@ exports.modifyThing = (req, res, next) => {
             } else {
                 const filename = thing.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
-                Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
-                    .then(() => res.status(200).json({ message: 'Objet modifié!' }))
-                    .catch(error => res.status(401).json({ error }));
+                    Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
+                        .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+                        .catch(error => res.status(401).json({ error }));
                 });
             }
         })
@@ -100,6 +100,52 @@ exports.likeDislikeSauce = (req, res, next) => {
     .catch(error => res.status(404).json({ error }));
 }
 */
+
+//essai 3 - échec
+exports.likeDislikeSauce = (req, res, next) => {
+    const likeDislikeStatus = req.body.like;
+    const userId = req.body.userId; //let votant
+    //const sauceId = req.params.id;
+
+    let vote;//valueVote
+
+    // determine si l'utilisateur est dans un tableau
+
+
+    Thing.findOne({ _id: req.params.id })
+        // .then((thing) => {
+        .then((thing) => {
+            let userVotedLike = thing.usersLiked.includes(userId);//bon
+            let userVotedDislike = thing.usersDisliked.includes(votant);//mauvais
+            // ce comparateur va attribuer une valeur de point en fonction du tableau dans lequel il est
+            if (userVotedLike === true) {
+                vote = 1;
+            } else if (userVotedDislike === true) {
+                vote = -1;
+            } else {
+                vote = 0;
+            }
+
+            if (vote === 0 && likeDislikeStatus === 1) {
+                Thing.updateOne({ _id: req.params.id }, { $push: { usersLiked: userId }, $inc: { likes: 1 } })
+                    .then(() => res.status(201).json({ message: 'you liked this sauce' }))
+                    .catch(error => res.status(400).json({ error }))
+            } else if (vote === 0 && likeDislikeStatus === -1) {
+                Thing.updateOne({ _id: req.params.id }, { $push: { usersDisliked: userId }, $inc: { dislikes: 1 } })
+                    .then(() => res.status(201).json({ message: 'you doesn\'t like this sauce' }))
+                    .catch(error => res.status(400).json({ error }))
+            } else if (valeurVote === 1 && likeDislikeStatus === 0) {
+                Thing.updateOne({ _id: req.params.id }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
+                    .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
+                    .catch(error => res.status(400).json({ error }))
+            } else if (valeurVote === -1 && likeDislikeStatus === 0) {
+                Thing.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
+                    .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
+                    .catch(error => res.status(400).json({ error }))
+            }
+        })
+        .catch(error => res.status(404).json({ error }))
+}
 
 /* //essai 2 echec
 // https://stackoverflow.com/questions/74645895/like-dislike-system-with-nodejs
@@ -211,7 +257,7 @@ exports.likeDislikeSauce = (req, res, next) => {
 }
 */
 
-/*
+/* stackoverflow - solution d'origine
 exports.likeSauce = (req, res, next) => {  
   const liker = req.body.userId;
   let likeStatus = req.body.like;
@@ -239,3 +285,6 @@ exports.likeSauce = (req, res, next) => {
     })
     .catch(error => res.status(400).json({ error }))
 };*/
+
+
+
