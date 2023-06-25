@@ -17,7 +17,9 @@ imageUrl : {type: String, required: true},
 heat : {type: Number, required: true},
 
 likes : {type: Number, required: true, default: 0},
+// likes : {type: Number, required: true, default: 10},
 dislikes : {type: Number, required: true, default: 0},
+// dislikes : {type: Number, required: true, default: 20},
 usersLiked : {type: [String], required: true, default: []},
 usersDisliked : {type: [String], required: true, default: []},
 
