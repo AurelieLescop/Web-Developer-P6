@@ -1,23 +1,23 @@
-const Thing = require('../models/thing');
+const Sauce = require('../models/sauce');
 const fs = require('fs');
 
 // changer Thing en sauce
-exports.createThing = (req, res, next) => {
+exports.createSauce = (req, res, next) => {
     // function createThing(req, res, next) {
 
     //const thingObject = JSON.parse(req.body.thing);
-    const thingObject = JSON.parse(req.body.sauce);
-    delete thingObject._id;
-    delete thingObject._userId;
-    const thing = new Thing({
+    const sauceObject = JSON.parse(req.body.sauce);
+    delete sauceObject._id;
+    delete sauceObject._userId;
+    const sauce = new Sauce({
         // const sauce = new Sauce({
 
-        ...thingObject,
+        ...sauceObject,
         userId: req.auth.userId,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
 
-    thing.save()
+    sauce.save()
         //sauce.save()
         .then(() => { res.status(201).json({ message: 'Sauce enregistrée !' }) })
         .catch(error => { res.status(400).json({ error }) })
@@ -25,22 +25,22 @@ exports.createThing = (req, res, next) => {
 
 // exports.createThing = createThing;
 
-exports.modifyThing = (req, res, next) => {
-    const thingObject = req.file ? {
+exports.modifySauce = (req, res, next) => {
+    const sauceObject = req.file ? {
         //   ...JSON.parse(req.body.thing),
         ...JSON.parse(req.body.sauce),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
 
-    delete thingObject._userId
-    Thing.findOne({ _id: req.params.id })
-        .then((thing) => {
-            if (thing.userId != req.auth.userId) {
+    delete sauceObject._userId
+    Sauce.findOne({ _id: req.params.id })
+        .then((sauce) => {
+            if (sauce.userId != req.auth.userId) {
                 res.status(401).json({ message: 'Not authorized' });
             } else {
-                const filename = thing.imageUrl.split('/images/')[1];
+                const filename = sauce.imageUrl.split('/images/')[1];
                 // fs.unlink(`images/${filename}`, () => {
-                    Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
+                    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
                         .then(() => res.status(200).json({ message: 'Objet modifié!' }))
                         .catch(error => res.status(401).json({ error }));
                 // });
@@ -51,15 +51,15 @@ exports.modifyThing = (req, res, next) => {
         });
 };
 
-exports.deleteThing = (req, res, next) => {
-    Thing.findOne({ _id: req.params.id })
-        .then(thing => {
-            if (thing.userId != req.auth.userId) {
+exports.deleteSauce = (req, res, next) => {
+    Sauce.findOne({ _id: req.params.id })
+        .then(sauce => {
+            if (sauce.userId != req.auth.userId) {
                 res.status(401).json({ message: 'Not authorized' });
             } else {
-                const filename = thing.imageUrl.split('/images/')[1];
+                const filename = sauce.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
-                    Thing.deleteOne({ _id: req.params.id })
+                    Sauce.deleteOne({ _id: req.params.id })
                         .then(() => { res.status(200).json({ message: 'Objet supprimé !' }) })
                         .catch(error => res.status(401).json({ error }));
                 });
@@ -70,9 +70,9 @@ exports.deleteThing = (req, res, next) => {
         });
 };
 
-exports.getOneThing = (req, res, next) => {
-    Thing.findOne({ _id: req.params.id })
-        .then(thing => res.status(200).json(thing))
+exports.getOneSauce = (req, res, next) => {
+    Sauce.findOne({ _id: req.params.id })
+        .then(sauce => res.status(200).json(sauce))
         .catch(error => res.status(404).json({ error }));
 };
 
@@ -83,9 +83,9 @@ exports.getOneThing = (req, res, next) => {
 });*/
 //app.use('/api/stuff', (req, res, next) => {
 
-exports.getAllThings = (req, res, next) => {
-    Thing.find()
-        .then(things => res.status(200).json(things))
+exports.getAllSauces = (req, res, next) => {
+    Sauce.find()
+        .then(sauces => res.status(200).json(sauces))
         .catch(error => res.status(400).json({ error }));
 };
 
@@ -112,11 +112,11 @@ exports.likeDislikeSauce = (req, res, next) => {
     // determine si l'utilisateur est dans un tableau
 
 
-    Thing.findOne({ _id: req.params.id })
+    Sauce.findOne({ _id: req.params.id })
         // .then((thing) => {
-        .then((thing) => {
-            let userVotedLike = thing.usersLiked.includes(userId);//bon
-            let userVotedDislike = thing.usersDisliked.includes(votant);//mauvais
+        .then((sauce) => {
+            let userVotedLike = sauce.usersLiked.includes(userId);//bon
+            let userVotedDislike = sauce.usersDisliked.includes(votant);//mauvais
             // ce comparateur va attribuer une valeur de point en fonction du tableau dans lequel il est
             if (userVotedLike === true) {
                 vote = 1;
@@ -127,19 +127,19 @@ exports.likeDislikeSauce = (req, res, next) => {
             }
 
             if (vote === 0 && likeDislikeStatus === 1) {
-                Thing.updateOne({ _id: req.params.id }, { $push: { usersLiked: userId }, $inc: { likes: 1 } })
+                Sauce.updateOne({ _id: req.params.id }, { $push: { usersLiked: userId }, $inc: { likes: 1 } })
                     .then(() => res.status(201).json({ message: 'you liked this sauce' }))
                     .catch(error => res.status(400).json({ error }))
             } else if (vote === 0 && likeDislikeStatus === -1) {
-                Thing.updateOne({ _id: req.params.id }, { $push: { usersDisliked: userId }, $inc: { dislikes: 1 } })
+                Sauce.updateOne({ _id: req.params.id }, { $push: { usersDisliked: userId }, $inc: { dislikes: 1 } })
                     .then(() => res.status(201).json({ message: 'you doesn\'t like this sauce' }))
                     .catch(error => res.status(400).json({ error }))
             } else if (valeurVote === 1 && likeDislikeStatus === 0) {
-                Thing.updateOne({ _id: req.params.id }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
+                Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
                     .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
                     .catch(error => res.status(400).json({ error }))
             } else if (valeurVote === -1 && likeDislikeStatus === 0) {
-                Thing.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
+                Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
                     .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
                     .catch(error => res.status(400).json({ error }))
             }
