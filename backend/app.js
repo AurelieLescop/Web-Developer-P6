@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const express = require('express');
+const helmet = require('helmet');
 
 const app = express();
 
@@ -31,5 +32,6 @@ app.use((req, res, next) => {
 app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use(helmet());
 
 module.exports = app;
