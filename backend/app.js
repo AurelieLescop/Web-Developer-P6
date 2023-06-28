@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const express = require('express');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -10,6 +11,19 @@ const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
 
 const path = require('path'); 
+
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // Voici l’équivalent de 10 minutes
+  max: 100 // Le client pourra donc faire 100 requêtes toutes les 10 minutes
+//   handler: function (req, res, /*next*/) {
+//     return res.status(429).json({
+//       error: 'You sent too many requests. Please wait a while then try again'
+//     })
+// }
+});
+ 
+//  Cette limite de 100 requêtes toutes les 10 minutes sera effective sur toutes les routes.
+app.use(limiter);
 
 mongoose.connect('mongodb+srv://Lily:uxBLzmcRsOqJqrsC@cluster0.mzvepik.mongodb.net/?retryWrites=true&w=majority',
   {
