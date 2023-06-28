@@ -39,11 +39,18 @@ exports.modifySauce = (req, res, next) => {
                 res.status(401).json({ message: 'Not authorized' });
             } else {
                 const filename = sauce.imageUrl.split('/images/')[1];
-                // fs.unlink(`images/${filename}`, () => {
+                // if (filename == sauceObject.filename)
+                if (sauce.imageUrl == req.body.sauce.imageUrl) { // attention aux noms sauce
                     Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
                         .then(() => res.status(200).json({ message: 'Objet modifié!' }))
                         .catch(error => res.status(401).json({ error }));
-                // });
+                } else {
+                fs.unlink(`images/${filename}`, () => {
+                    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                    .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+                    .catch(error => res.status(401).json({ error }));
+                })
+            };
             }
         })
         .catch((error) => {
@@ -101,6 +108,10 @@ exports.likeDislikeSauce = (req, res, next) => {
 }
 */
 
+const LIKE_SAUCE = 1;
+const DISLIKE_SAUCE = -1;
+const CANCEL_LIKE_DISLIKE = 0; 
+
 //essai 3 - échec
 exports.likeDislikeSauce = (req, res, next) => {
     const likeDislikeStatus = req.body.like;
@@ -115,34 +126,56 @@ exports.likeDislikeSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         // .then((thing) => {
         .then((sauce) => {
-            let userVotedLike = sauce.usersLiked.includes(userId);//bon
-            let userVotedDislike = sauce.usersDisliked.includes(votant);//mauvais
-            // ce comparateur va attribuer une valeur de point en fonction du tableau dans lequel il est
-            if (userVotedLike === true) {
-                vote = 1;
-            } else if (userVotedDislike === true) {
-                vote = -1;
+
+            if (likeDislikeStatus == LIKE_SAUCE) {
+                //likeSauce(sauce.id, userId)
+
+            } else if (likeDislikeStatus == DISLIKE_SAUCE) {
+                //dislikeSauce(sauce.id, userId)
+
             } else {
-                vote = 0;
+                let indexLike = sauce.usersLiked.findIndex(s => s == userId)
+                let indexDislike = sauce.usersDisliked.findIndex(s => s == userId)
+                if (indexLike > -1) {
+                    // cancelLike
+                    //updateone, décrement like et enlève tableau usersLiked 
+                } else if (indexDislike > -1) {
+                    //cancelDislike
+
+                }
             }
 
-            if (vote === 0 && likeDislikeStatus === 1) {
-                Sauce.updateOne({ _id: req.params.id }, { $push: { usersLiked: userId }, $inc: { likes: 1 } })
-                    .then(() => res.status(201).json({ message: 'you liked this sauce' }))
-                    .catch(error => res.status(400).json({ error }))
-            } else if (vote === 0 && likeDislikeStatus === -1) {
-                Sauce.updateOne({ _id: req.params.id }, { $push: { usersDisliked: userId }, $inc: { dislikes: 1 } })
-                    .then(() => res.status(201).json({ message: 'you doesn\'t like this sauce' }))
-                    .catch(error => res.status(400).json({ error }))
-            } else if (valeurVote === 1 && likeDislikeStatus === 0) {
-                Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
-                    .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
-                    .catch(error => res.status(400).json({ error }))
-            } else if (valeurVote === -1 && likeDislikeStatus === 0) {
-                Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
-                    .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
-                    .catch(error => res.status(400).json({ error }))
-            }
+
+
+        //     let userVotedLike = sauce.usersLiked.includes(userId);//bon
+        //     let userVotedDislike = sauce.usersDisliked.includes(votant);//mauvais
+        //     // ce comparateur va attribuer une valeur de point en fonction du tableau dans lequel il est
+        //     if (userVotedLike === true) {
+        //         vote = 1;
+        //     } else if (userVotedDislike === true) {
+        //         vote = -1;
+        //     } else {
+        //         vote = 0;
+        //     }
+            
+
+        //     if (vote === 0 && likeDislikeStatus === 1) {
+                // Sauce.updateOne({ _id: req.params.id }, { $push: { usersLiked: userId }, $inc: { likes: 1 } })
+        //             .then(() => res.status(201).json({ message: 'you liked this sauce' }))
+        //             .catch(error => res.status(400).json({ error }))
+        //     } else if (vote === 0 && likeDislikeStatus === -1) {
+        //         Sauce.updateOne({ _id: req.params.id }, { $push: { usersDisliked: userId }, $inc: { dislikes: 1 } })
+        //             .then(() => res.status(201).json({ message: 'you doesn\'t like this sauce' }))
+        //             .catch(error => res.status(400).json({ error }))
+        //     } else if (valeurVote === 1 && likeDislikeStatus === 0) {
+        //         Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
+        //             .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
+        //             .catch(error => res.status(400).json({ error }))
+        //     } else if (valeurVote === -1 && likeDislikeStatus === 0) {
+        //         Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
+        //             .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
+        //             .catch(error => res.status(400).json({ error }))
+        //     }
         })
         .catch(error => res.status(404).json({ error }))
 }
