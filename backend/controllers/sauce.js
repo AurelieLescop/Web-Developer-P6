@@ -40,16 +40,37 @@ exports.modifySauce = (req, res, next) => {
             } else {
                 const filename = sauce.imageUrl.split('/images/')[1];
                 // if (filename == sauceObject.filename)
-                if (sauce.imageUrl == req.body.sauce.imageUrl) { // attention aux noms sauce
+                // if (sauce.imageUrl == req.body.sauce.imageUrl) { // attention aux noms sauce
+                //if (sauce.imageUrl === sauceObject.imageUrl) { // attention aux noms sauce
+                // if (typeof sauceObject.imageUrl === undefined) { // attention aux noms sauce
+                if (sauceObject.imageUrl == null) { // attention aux noms sauce
+
+
+
+                    console.log(sauce.imageUrl);
+                    // console.log(req.body.sauce.imageUrl);
+                    console.log(sauceObject.imageUrl);
+                    console.log(sauceObject);
+                    console.log(typeof sauceObject.imageUrl)
+                
                     Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
                         .then(() => res.status(200).json({ message: 'Objet modifié!' }))
                         .catch(error => res.status(401).json({ error }));
                 } else {
-                fs.unlink(`images/${filename}`, () => {
+                    console.log(sauce.imageUrl);
+                    // console.log(req.body.imageUrl);
+                    console.log(sauceObject.imageUrl);
+                    console.log(sauceObject);
+                    console.log(typeof sauceObject.imageUrl)
+
+
+
+
+               fs.unlink(`images/${filename}`, () => {
                     Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
                     .then(() => res.status(200).json({ message: 'Objet modifié!' }))
                     .catch(error => res.status(401).json({ error }));
-                })
+               })
             };
             }
         })
