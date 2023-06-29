@@ -150,6 +150,12 @@ function likeSauce(req, res, userId) {
         .catch(error => res.status(400).json({ error }))
 }
 
+function dislikeSauce(req, res, userId) {
+    Sauce.updateOne({ _id: req.params.id }, { $push: { usersDisliked: userId }, $inc: { dislikes: 1 } })
+        .then(() => res.status(201).json({ message: 'you doesn\'t like this sauce' }))
+        .catch(error => res.status(400).json({ error }))
+}
+
 //en cours
 exports.likeDislikeSauce = (req, res, next) => {
     const likeDislikeStatus = req.body.like;
@@ -166,14 +172,10 @@ exports.likeDislikeSauce = (req, res, next) => {
         .then((sauce) => {
 
             if (likeDislikeStatus == LIKE_SAUCE) {
-                //likeSauce(sauce.id, userId)
                 likeSauce(req, res, userId);
-                // Sauce.updateOne({ _id: req.params.id }, { $push: { usersLiked: userId }, $inc: { likes: 1 } })
-                //     .then(() => res.status(201).json({ message: 'you liked this sauce' }))
-                //     .catch(error => res.status(400).json({ error }))
 
             } else if (likeDislikeStatus == DISLIKE_SAUCE) {
-                //dislikeSauce(sauce.id, userId)
+                dislikeSauce(req, res, userId);
 
             } else {
                 let indexLike = sauce.usersLiked.findIndex(s => s == userId)
