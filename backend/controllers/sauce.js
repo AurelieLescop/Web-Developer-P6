@@ -162,6 +162,12 @@ function cancelLike(req, res, userId) {
         .catch(error => res.status(400).json({ error }))
 }
 
+function cancelDislike(req, res, userId) {
+    Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
+        .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
+        .catch(error => res.status(400).json({ error }))
+}
+
 //en cours
 exports.likeDislikeSauce = (req, res, next) => {
     const likeDislikeStatus = req.body.like;
@@ -191,6 +197,7 @@ exports.likeDislikeSauce = (req, res, next) => {
                     //updateone, décrement like et enlève tableau usersLiked 
                     cancelLike(req, res, userId);
                 } else if (indexDislike > -1) {
+                    cancelDislike(req, res, userId);
                     //cancelDislike
 
                 }
