@@ -25,6 +25,12 @@ exports.createSauce = (req, res, next) => {
 
 // exports.createThing = createThing;
 
+function updateSauce (req, res, sauceObject) {
+    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+    .catch(error => res.status(401).json({ error }));
+}
+
 exports.modifySauce = (req, res, next) => {
     const sauceObject = req.file ? {
         //   ...JSON.parse(req.body.thing),
@@ -43,7 +49,8 @@ exports.modifySauce = (req, res, next) => {
                 // if (sauce.imageUrl == req.body.sauce.imageUrl) { // attention aux noms sauce
                 //if (sauce.imageUrl === sauceObject.imageUrl) { // attention aux noms sauce
                 // if (typeof sauceObject.imageUrl === undefined) { // attention aux noms sauce
-                if (sauceObject.imageUrl == undefined) { // ou null ? avec 2 ou 3 =?
+                if (sauceObject.imageUrl == undefined) { // ou null ? avec 2 ou 3 =? 
+                    // sauceObject ou req.body
 
 
 
@@ -52,24 +59,28 @@ exports.modifySauce = (req, res, next) => {
                     console.log(sauceObject.imageUrl);
                     console.log(sauceObject);
                     console.log(typeof sauceObject.imageUrl)
-                
-                    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-                        .then(() => res.status(200).json({ message: 'Objet modifié!' }))
-                        .catch(error => res.status(401).json({ error }));
+                    console.log(req.body.imageUrl)
+       
+                updateSauce(req, res, sauceObject);
+                    // Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                    //     .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+                    //     .catch(error => res.status(401).json({ error }));
                 } else {
                     console.log(sauce.imageUrl);
                     // console.log(req.body.imageUrl);
                     console.log(sauceObject.imageUrl);
                     console.log(sauceObject);
                     console.log(typeof sauceObject.imageUrl)
+                    console.log(req.body.imageUrl)
 
 
 
 
                fs.unlink(`images/${filename}`, () => {
-                    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-                    .then(() => res.status(200).json({ message: 'Objet modifié!' }))
-                    .catch(error => res.status(401).json({ error }));
+                updateSauce(req, res, sauceObject);
+                // Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                // .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+                // .catch(error => res.status(401).json({ error }));
                })
             };
             }
