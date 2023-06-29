@@ -43,12 +43,12 @@ exports.modifySauce = (req, res, next) => {
                 // if (sauce.imageUrl == req.body.sauce.imageUrl) { // attention aux noms sauce
                 //if (sauce.imageUrl === sauceObject.imageUrl) { // attention aux noms sauce
                 // if (typeof sauceObject.imageUrl === undefined) { // attention aux noms sauce
-                if (sauceObject.imageUrl == null) { // attention aux noms sauce
+                if (sauceObject.imageUrl == undefined) { // ou null ? avec 2 ou 3 =?
 
 
 
                     console.log(sauce.imageUrl);
-                    // console.log(req.body.sauce.imageUrl);
+                    // console.log(req.body.sauce.imageUrl); // si je conserve, ça bug
                     console.log(sauceObject.imageUrl);
                     console.log(sauceObject);
                     console.log(typeof sauceObject.imageUrl)
