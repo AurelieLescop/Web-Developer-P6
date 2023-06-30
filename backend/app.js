@@ -12,7 +12,7 @@ const userRoutes = require('./routes/user');
 
 const path = require('path'); 
 
-const limiter = rateLimit({
+const limiter1 = rateLimit({
   windowMs: 10 * 60 * 1000, // Voici l’équivalent de 10 minutes
   max: 100 // Le client pourra donc faire 100 requêtes toutes les 10 minutes
 //   handler: function (req, res, /*next*/) {
@@ -23,7 +23,7 @@ const limiter = rateLimit({
 });
  
 //  Cette limite de 100 requêtes toutes les 10 minutes sera effective sur toutes les routes.
-app.use(limiter);
+app.use(limiter1);
 
 mongoose.connect('mongodb+srv://Lily:uxBLzmcRsOqJqrsC@cluster0.mzvepik.mongodb.net/?retryWrites=true&w=majority',
   {
@@ -42,9 +42,14 @@ app.use((req, res, next) => {
   next();
 });
 
+const limiter2 = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 5
+})
+
 //app.use('/api/stuff', stuffRoutes);
 app.use('/api/sauces', sauceRoutes);
-app.use('/api/auth', userRoutes);
+app.use('/api/auth', userRoutes, limiter2);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(helmet());
 
