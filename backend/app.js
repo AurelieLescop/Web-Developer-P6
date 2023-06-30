@@ -4,7 +4,7 @@ dotenv.config();
 
 const express = require('express');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+// const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -14,15 +14,15 @@ const userRoutes = require('./routes/user');
 
 const path = require('path'); 
 
-const limiter1 = rateLimit({
-  windowMs: 10 * 60 * 1000, // Voici l’équivalent de 10 minutes
-  max: 100 // Le client pourra donc faire 100 requêtes toutes les 10 minutes
-//   handler: function (req, res, /*next*/) {
-//     return res.status(429).json({
-//       error: 'You sent too many requests. Please wait a while then try again'
-//     })
-// }
-});
+// const limiter1 = rateLimit({
+//   windowMs: 10 * 60 * 1000, // Voici l’équivalent de 10 minutes
+//   max: 100 // Le client pourra donc faire 100 requêtes toutes les 10 minutes
+// //   handler: function (req, res, /*next*/) {
+// //     return res.status(429).json({
+// //       error: 'You sent too many requests. Please wait a while then try again'
+// //     })
+// // }
+// });
  
 //  Cette limite de 100 requêtes toutes les 10 minutes sera effective sur toutes les routes.
 // app.use(limiter1);
@@ -46,14 +46,14 @@ app.use((req, res, next) => {
   next();
 });
 
-const limiter2 = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 5
-})
+// const limiter2 = rateLimit({
+//   windowMs: 15 * 60 * 1000, 
+//   max: 5
+// })
 
 //app.use('/api/stuff', stuffRoutes);
-app.use('/api/sauces', limiter1, sauceRoutes);
-app.use('/api/auth', limiter2, userRoutes);
+app.use('/api/sauces', sauceRoutes);
+app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(helmet());
 
