@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const express = require('express');
 const helmet = require('helmet');
@@ -23,9 +25,11 @@ const limiter1 = rateLimit({
 });
  
 //  Cette limite de 100 requêtes toutes les 10 minutes sera effective sur toutes les routes.
-app.use(limiter1);
+// app.use(limiter1);
 
-mongoose.connect('mongodb+srv://Lily:uxBLzmcRsOqJqrsC@cluster0.mzvepik.mongodb.net/?retryWrites=true&w=majority',
+// mongoose.connect('mongodb+srv://Lily:uxBLzmcRsOqJqrsC@cluster0.mzvepik.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect(
+  process.env.SECRET_DB,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -48,8 +52,8 @@ const limiter2 = rateLimit({
 })
 
 //app.use('/api/stuff', stuffRoutes);
-app.use('/api/sauces', sauceRoutes);
-app.use('/api/auth', userRoutes, limiter2);
+app.use('/api/sauces', limiter1, sauceRoutes);
+app.use('/api/auth', limiter2, userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(helmet());
 

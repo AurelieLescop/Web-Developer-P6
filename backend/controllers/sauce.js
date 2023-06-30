@@ -51,9 +51,6 @@ exports.modifySauce = (req, res, next) => {
                 // if (typeof sauceObject.imageUrl === undefined) { // attention aux noms sauce
                 if (sauceObject.imageUrl == undefined) { // ou null ? avec 2 ou 3 =? 
                     // sauceObject ou req.body
-
-
-
                     console.log(sauce.imageUrl);
                     // console.log(req.body.sauce.imageUrl); // si je conserve, ça bug
                     console.log(sauceObject.imageUrl);
@@ -72,10 +69,6 @@ exports.modifySauce = (req, res, next) => {
                     console.log(sauceObject);
                     console.log(typeof sauceObject.imageUrl)
                     console.log(req.body.imageUrl)
-
-
-
-
                     fs.unlink(`images/${filename}`, () => {
                         updateSauce(req, res, sauceObject);
                         // Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
@@ -200,6 +193,8 @@ exports.likeDislikeSauce = (req, res, next) => {
                     cancelDislike(req, res, userId);
                     //cancelDislike
 
+                } else {
+                  res.status(400).json({ error : "the user is not liking or disliking the sauce"})
                 }
             }
 
