@@ -37,7 +37,6 @@ exports.login = (req, res, next) => {
                         token: jwt.sign(
                             { userId: user._id },
                             process.env.SECRET_TOKEN,
-                              // 'RANDOM_TOKEN_SECRET',// génère un token random à mettre dans .env
                             { expiresIn: '24h' }
                         )
                     });
