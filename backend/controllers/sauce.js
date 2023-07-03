@@ -66,7 +66,7 @@ exports.modifySauce = (req, res, next) => {
     .then((sauce) => {
       //vérification que le requérant est bien le créateur de la sauce
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: 'Not authorized' });
+        res.status(403).json({ message: '403 : unauthorized request' });
       } else {
         //récupération du nom de l'ancien fichier image
         const filename = sauce.imageUrl.split('/images/')[1];
