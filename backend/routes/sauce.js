@@ -3,17 +3,23 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
+/**Importation express-rate-limit */
 const rateLimit = require('express-rate-limit');
 
+const sauceCtrl = require('../controllers/sauce');
 
-const sauceCtrl = require('../controllers/sauce');;
-//const stuffCtrl = require('../controllers/sauce');;
-
+/**Configuration limiteur de express-rate-limit */
 const limiter1 = rateLimit({
-    windowMs: 10 * 60 * 1000, // Voici l’équivalent de 10 minutes
-    max: 100 // Le client pourra donc faire 100 requêtes toutes les 10 minutes
+    //équivalent de 10 minutes
+    windowMs: 10 * 60 * 1000, 
+    //nombre de requête maximales dans le temps imparti
+    max: 100
   });
 
+  /**Application du middleware d'authentification à toutes les routes en tant qu'argument pour les protéger
+   * Seules les requêtes authentifiées seront gérées
+   * Application d'un limiteur du nombres de requêtes réalisées dans un temps imparti
+   */
 router.post('/', auth, limiter1, multer, sauceCtrl.createSauce);
 router.put('/:id', auth, limiter1, multer, sauceCtrl.modifySauce);
 router.delete('/:id', auth, limiter1, sauceCtrl.deleteSauce);

@@ -8,6 +8,7 @@ const limiter2 = rateLimit({
     max: 50
   })
 
+  
 router.post('/signup', limiter2, userCtrl.signup);
 router.post('/login', limiter2, userCtrl.login);
 
