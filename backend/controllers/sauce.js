@@ -69,7 +69,7 @@ exports.modifySauce = (req, res, next) => {
         const filename = sauce.imageUrl.split('/images/')[1];
         //si pas d'ajout d'une nouvelle image, mise à jour de la sauce
         if (sauceObject.imageUrl == undefined) {
-          // Modification de ton object
+          // Modification de la sauce
           updateSauce({
             ...sauceObject,
             _id: req.params.id,
@@ -79,7 +79,7 @@ exports.modifySauce = (req, res, next) => {
             .catch(error => res.status(500).json({ error }));
           //si ajout d'une nouvelle image, suppression de l'image dans le dossier images et mise à jour de la sauce
         } else {
-          // on met à jour la sauce avec la nouvelle image avant de supprimer l'image précédente 
+          // mise à jour de la sauce avec la nouvelle image avant de supprimer l'image précédente
           updateSauce({
             ...sauceObject,
             _id: req.params.id,
