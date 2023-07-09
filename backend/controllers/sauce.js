@@ -1,7 +1,6 @@
 /**Importation du modèle sauce */
 const Sauce = require('../models/sauce');
 
-const SauceService = require('../services/sauce');
 /**Importaion de fs (filesystem) */
 const fs = require('fs');
 const fsPromise = require('fs/promises');
@@ -39,17 +38,11 @@ exports.createSauce = (req, res, next) => {
 };
 
 /**Fonction permettant la mise à jour de la sauce dans la base de données * 
- * @param {*} req la requête
- * @param {*} res la réponse
  * @param {*} sauceObject la sauce
  */
-function updateSauceOld(req, res, sauceObject) {
-  //utilisation de la méthode updateOne avec en 1er argument l'objet de comparaison (pour savoir quel objet on modifie) et en 2e argument la nouvelle version de l'objet
-  Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Objet modifié!' }))
-    .catch(error => res.status(401).json({ error }));
-}
-
+function updateSauce(sauceObject) {
+  return Sauce.updateOne({ _id: sauceObject._id }, sauceObject);
+};
 
 /**Fonction permettant de modifier la sauce par l'utilisateur l'ayant créé
  * @param {*} req la requête
@@ -77,22 +70,28 @@ exports.modifySauce = (req, res, next) => {
         //si pas d'ajout d'une nouvelle image, mise à jour de la sauce
         if (sauceObject.imageUrl == undefined) {
           // Modification de ton object
-          SauceService.updateSauce({
+          updateSauce({
             ...sauceObject,
             _id: req.params.id,
           })
             // Gestion de la reponse du controller.
             .then(() => res.status(200).json({ message: 'Objet modifié!' }))
             .catch(error => res.status(500).json({ error }));
-        //si ajout d'une nouvelle image, suppression de l'image dans le dossier images et mise à jour de la sauce
+          //si ajout d'une nouvelle image, suppression de l'image dans le dossier images et mise à jour de la sauce
         } else {
-          //
-          updateSauce(req, res, sauceObject)
+          // on met à jour la sauce avec la nouvelle image avant de supprimer l'image précédente 
+          updateSauce({
+            ...sauceObject,
+            _id: req.params.id,
+          })
             .then(() => {
               fsPromise.unlink(`images/${filename}`)
                 .then(() => res.status(200).json({ message: 'Objet modifié!' }))
                 .catch(error => res.status(500).json({ error }));
             })
+            .catch((error) => {
+              res.status(400).json({ error });
+            });
         };
       }
     })
@@ -138,7 +137,7 @@ exports.deleteSauce = (req, res, next) => {
 exports.getOneSauce = (req, res, next) => {
   //utilisation de la méthode findOne dans le modèle Sauce pour trouver la Sauce unique ayant le même _id que le paramètre de la requête
   Sauce.findOne({ _id: req.params.id })
-  //La sauce est retournée dans une promise et renvoyée au frontend
+    //La sauce est retournée dans une promise et renvoyée au frontend
     .then(sauce => res.status(200).json(sauce))
     //si aucune sauce n'est trouvée ou si une erreur se produit, envoi d'une erreur 404 au frontend avec l'erreur générée
     .catch(error => res.status(404).json({ error }));
@@ -155,7 +154,6 @@ exports.getAllSauces = (req, res, next) => {
     .then(sauces => res.status(200).json(sauces))
     .catch(error => res.status(400).json({ error }));
 };
-
 
 const LIKE_SAUCE = 1;
 const DISLIKE_SAUCE = -1;
