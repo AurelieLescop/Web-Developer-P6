@@ -1,7 +1,10 @@
 /**Importation du modèle sauce */
 const Sauce = require('../models/sauce');
+
+const SauceService = require('../services/sauce');
 /**Importaion de fs (filesystem) */
 const fs = require('fs');
+const fsPromise = require('fs/promises');
 
 /**Création de sauce
  * @param {*} req la requête envoyée par l'utilisateur qui contient toutes les informations de la nouvelle sauce
@@ -40,12 +43,13 @@ exports.createSauce = (req, res, next) => {
  * @param {*} res la réponse
  * @param {*} sauceObject la sauce
  */
-function updateSauce(req, res, sauceObject) {
+function updateSauceOld(req, res, sauceObject) {
   //utilisation de la méthode updateOne avec en 1er argument l'objet de comparaison (pour savoir quel objet on modifie) et en 2e argument la nouvelle version de l'objet
   Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
     .then(() => res.status(200).json({ message: 'Objet modifié!' }))
     .catch(error => res.status(401).json({ error }));
 }
+
 
 /**Fonction permettant de modifier la sauce par l'utilisateur l'ayant créé
  * @param {*} req la requête
@@ -72,12 +76,23 @@ exports.modifySauce = (req, res, next) => {
         const filename = sauce.imageUrl.split('/images/')[1];
         //si pas d'ajout d'une nouvelle image, mise à jour de la sauce
         if (sauceObject.imageUrl == undefined) {
-          updateSauce(req, res, sauceObject);
+          // Modification de ton object
+          SauceService.updateSauce({
+            ...sauceObject,
+            _id: req.params.id,
+          })
+            // Gestion de la reponse du controller.
+            .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+            .catch(error => res.status(500).json({ error }));
         //si ajout d'une nouvelle image, suppression de l'image dans le dossier images et mise à jour de la sauce
         } else {
-          fs.unlink(`images/${filename}`, () => {
-            updateSauce(req, res, sauceObject);
-          })
+          //
+          updateSauce(req, res, sauceObject)
+            .then(() => {
+              fsPromise.unlink(`images/${filename}`)
+                .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+                .catch(error => res.status(500).json({ error }));
+            })
         };
       }
     })

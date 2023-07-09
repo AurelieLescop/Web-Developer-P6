@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 /**Définition de la limitation de requête */
 const limiter2 = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 50
+    max: 30
 })
 
 /**Interception des requêtes post d'inscription et d'authentification */
