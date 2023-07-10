@@ -157,6 +157,7 @@ exports.getAllSauces = (req, res, next) => {
 
 const LIKE_SAUCE = 1;
 const DISLIKE_SAUCE = -1;
+const RESET_LIKE_DISLIKE_SAUCE = 0;
 
 /** "like" de la sauce par l'utilisateur
  * @param {*} req la requête
@@ -186,9 +187,7 @@ function dislikeSauce(req, res, userId) {
  * @param {*} userId l'identifiant
  */
 function cancelLike(req, res, userId) {
-  Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
-    .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
-    .catch(error => res.status(400).json({ error }))
+  return Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
 };
 
 /** Annulation du "dislike" de la sauce par l'utilisateur
@@ -197,9 +196,7 @@ function cancelLike(req, res, userId) {
  * @param {*} userId l'identifiant
  */
 function cancelDislike(req, res, userId) {
-  Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
-    .then(() => res.status(201).json({ message: 'you have no opinion on this sauce' }))
-    .catch(error => res.status(400).json({ error }))
+  return Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
 };
 
 /** Fonction selon si l'utilisateur "like" ou "dislike" la sauce
@@ -209,25 +206,45 @@ function cancelDislike(req, res, userId) {
  */
 exports.likeDislikeSauce = (req, res, next) => {
   const likeDislikeStatus = req.body.like;
-  const userId = req.body.userId;
+  const userId = req.auth.userId;
 
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (likeDislikeStatus == LIKE_SAUCE) {
+      let indexLike = sauce.usersLiked.findIndex(s => s == userId)
+      let indexDislike = sauce.usersDisliked.findIndex(s => s == userId)
+
+      if (indexLike > -1) {
+        cancelLike(req, res, userId)
+          .then(() => {
+            if (likeDislikeStatus == LIKE_SAUCE) {
+              likeSauce(req, res, userId);
+            } else if (likeDislikeStatus == DISLIKE_SAUCE) {
+              dislikeSauce(req, res, userId);
+            } else {
+              res.status(200).json({ message: 'you have no opinion on this sauce' });
+            }
+          })
+          .catch((error) => res.status(500).json({ error }))
+      } else if (indexDislike > -1) {
+        cancelDislike(req, res, userId)
+          .then(() => {
+            if (likeDislikeStatus == LIKE_SAUCE) {
+              likeSauce(req, res, userId);
+            } else if (likeDislikeStatus == DISLIKE_SAUCE) {
+              dislikeSauce(req, res, userId);
+            } else {
+              res.status(200).json({ message: 'you have no opinion on this sauce' });
+            }
+          })
+          .catch((error) => res.status(500).json({ error }))
+      } else if (likeDislikeStatus == 0) {
+        res.status(400).json({ error: "the user is not liking or disliking the sauce" })
+        return;
+      } else  if (likeDislikeStatus == LIKE_SAUCE) {
         likeSauce(req, res, userId);
       } else if (likeDislikeStatus == DISLIKE_SAUCE) {
         dislikeSauce(req, res, userId);
-      } else {
-        let indexLike = sauce.usersLiked.findIndex(s => s == userId)
-        let indexDislike = sauce.usersDisliked.findIndex(s => s == userId)
-        if (indexLike > -1) {
-          cancelLike(req, res, userId);
-        } else if (indexDislike > -1) {
-          cancelDislike(req, res, userId);
-        } else {
-          res.status(400).json({ error: "the user is not liking or disliking the sauce" })
-        }
       }
     })
-    .catch(error => res.status(404).json({ error }))
+  .catch(error => res.status(404).json({ error }))
 };

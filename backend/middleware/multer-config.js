@@ -24,8 +24,20 @@ const storage = multer.diskStorage({
     const extension = MIME_TYPES[file.mimetype];
     //Utilisation d'un timestamp pour rendre le nom le plus unique possible
     callback(null, name + Date.now() + '.' + extension);
-  }
+  },
 });
 
+// https://www.npmjs.com/package/multer
+const fileFilter = function (req, file, cb) {
+  if (Object.keys(MIME_TYPES).includes(file.mimetype)) {
+    cb(null, true)
+  }
+  return cb(new Error('Invalid mime type'));
+}
+
+
 /**Exportation de l'élément multer entièrement configuré */
-module.exports = multer({ storage: storage }).single('image');
+module.exports = multer({
+  storage,
+  fileFilter,
+}).single('image');
