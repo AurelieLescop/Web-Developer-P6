@@ -39,5 +39,5 @@ const fileFilter = function (req, file, cb) {
 /**Exportation de l'élément multer entièrement configuré */
 module.exports = multer({
   storage,
-  fileFilter,
+  // fileFilter,
 }).single('image');
